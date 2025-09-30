@@ -106,8 +106,14 @@ def infer_gene_cluster_differentiation(gene_list: list = None,
                         RNA_target_clusters.loc[len(RNA_target_clusters)] = list(curve)     
                 RNA_data = pd.DataFrame()
                 RNA_data['label'] = pline
+                test_df = pd.DataFrame({gene_name: RNA_target_clusters.mean()}).transpose()
+                print(test_df)
                 table2 = _fit_best_model_(pd.DataFrame({gene_name: RNA_target_clusters.mean()}).transpose(),
-                                        RNA_data, pval_thr = 1)
+                                          RNA_data, pval_thr = 1)
+                
+                print("table2:", table2)
+                print('type:', type(table2))
+
                 polyline2 = make_linearCombination(table2, gene_name, 'Feature ID', n_points, start, end)
                 
                 # get curve to compute fold change

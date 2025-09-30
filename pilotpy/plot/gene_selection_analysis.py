@@ -28,8 +28,8 @@ import gseapy as gp
 
 from .curve_activity import _curvesnamic_network_char_terminal_logfc_, \
     _curvesnamic_network_char_transient_logfc_, \
-        _curvesnamic_network_char_switching_time_, \
-            _curvesnamic_network_char_area_
+    _curvesnamic_network_char_switching_time_, \
+    _curvesnamic_network_char_area_
 
 
 def generate_feature_list(func_type, X):
@@ -350,7 +350,7 @@ def plot_each_cluster_activities(curves: pd.DataFrame = None,
     plt.show()
     
 def adjust_p_values(p_values):
-    p = np.asfarray(p_values)
+    p = np.asarray(p_values)
     by_descend = p.argsort()[::-1]
     by_orig = by_descend.argsort()
     steps = float(len(p)) / np.arange(len(p), 0, -1)

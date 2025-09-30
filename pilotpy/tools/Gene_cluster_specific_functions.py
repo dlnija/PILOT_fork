@@ -9,7 +9,7 @@ from sklearn.covariance import empirical_covariance
 from numpy.linalg import eig
 from scipy import stats
 from sklearn.linear_model import HuberRegressor, LinearRegression
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import root_mean_squared_error
 import statsmodels
 from statsmodels.stats.multitest import multipletests
 import statsmodels.stats as smf
@@ -22,6 +22,7 @@ from matplotlib.lines import Line2D
 from decimal import Decimal
 from matplotlib.ticker import FormatStrFormatter
 import pickle
+from warnings import warn
 
 
 def get_gene_dict(gene_list: list = None,
@@ -341,11 +342,11 @@ def _fit_model_(func_type: str = None,
             except ValueError:
                 continue
             break
-    params = np.append(model.intercept_,model.coef_)
+    params = np.append(model.intercept_, model.coef_)
     predictions = model.predict(X)
     results['rsquared_adj'] = 1 - (1 - model.score(X, y)) * (len(y) - 1) / \
                                     (len(y) - X.shape[1] - 1)
-    results['rmse'] = mean_squared_error(y, predictions, squared=False)
+    results['rmse'] = root_mean_squared_error(y, predictions)
 
     new_X = np.append(np.ones((len(X),1)), X, axis=1)
     M_S_E = (sum((y-predictions)**2)) / (len(new_X)-len(new_X[0]))
@@ -391,6 +392,8 @@ def _fit_best_model_(target: pd.DataFrame = None,
     assert model_type in ['LinearRegression', 'HuberRegressor'], \
         'model type must be LinearRegression, or HuberRegressor'
     
+    
+
     x = np.array(list(data['label']))
     min_x = min(x)
     max_x = max(x)
@@ -406,6 +409,8 @@ def _fit_best_model_(target: pd.DataFrame = None,
             for func_type in fun_types:
                 
                 results = _fit_model_(func_type, x, tf, model_type)
+
+                print('results:\n', results)
             
                 if(all(i <= pval_thr for i in list(results['pvalues']))):
                     
@@ -457,6 +462,9 @@ def _fit_best_model_(target: pd.DataFrame = None,
         
     sorted_best = {k: v for k, v in sorted(best_r2.items(),
                                            key = lambda item: item[1][1]['rsquared_adj'], reverse=True)}
+    
+    print('sorted_best,\n', sorted_best)
+
     try: 
         if(bool(sorted_best)):
             table = make_table(sorted_best)
